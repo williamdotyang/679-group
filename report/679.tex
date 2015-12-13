@@ -1,0 +1,86 @@
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+\usepackage[utf8]{inputenc}
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{letterpaper} % or letterpaper (US) or a5paper or....
+\geometry{left=2 cm,right=2 cm,top=2.5 cm,bottom=2.5 cm}
+\usepackage{graphicx} % support the \includegraphics command and options
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+\usepackage{amsmath}
+
+\begin{document}
+\section{Asymptotic Properties}
+The author derives asymptotic properties of both lasso-type and garrote-type estimators to provide illustrations of mechanism of the estimators. We only consider the assumption that $p$ is held as $n\rightarrow \infty$, while $p\rightarrow \infty$ and $n\rightarrow \infty$ should be more realistic. 
+
+\subsection{Lasso-Type Estimator}
+\subsubsection{Theorem (Theorem 1)}
+If $\sqrt{n} \lambda \rightarrow \lambda_0 \leq 0$ as $n\rightarrow \infty$, the lasso-type estimator is such that 
+\[\sqrt{n} \left( \hat{C} - C\right) \stackrel{d}{\rightarrow} \mbox{arg} \min_U \left( V\right) \mbox{,} \] 
+where
+\[V(U)=tr(U\Sigma U\Sigma )+tr(UW)+\lambda_0 \sum_{i\neq j}\left\lbrace u_{ij} \mbox{sign} (c_{ij})I(c_{ij}\neq 0)+|u_{ij}| I(c_{ij} =0) \right\rbrace \mbox{,}\]
+in which $W$ is a random symmetric $p\times p$ matrix such that $vec(W)\sim N(0, \Lambda)$, and $\Lambda$ is such that $cov(w_{ij},w_{i'j'})=cov(X^{(i)}X^{(j)},X^{(i')}X^{(j')})$. \\
+
+The theorem shows that the lasso-type estimator converges to a limiting distribution as $n\rightarrow \infty$ with a proper choice of $\lambda$. It also reveals the weakness of lasso-type estimator, for it has no guarantee of sparsity and consistency of model selection, and it is asymptotically biased rather than a consistent estimator of the concentration matrix.
+
+\subsubsection{Summary of Proof}
+\begin{itemize}
+\item First, let the estimator $\hat{C}=C+\frac{U}{\sqrt{n}}$. Subtly define $V_n(U)$ as the difference between the objective function values of $\hat{C}$ and $C$: \[V_n(U)=-log\left\vert C+\frac{U}{\sqrt{n}}\right\vert +tr\left\lbrace \left( C+\frac{U}{\sqrt{n}}\right) \bar{A}\right\rbrace +\lambda \sum_{i\neq j} \left\vert c_{ij}+\frac{u_{ij}}{\sqrt{n}}\right\vert +log|C|-tr(C\bar{A})-\lambda \sum_{i\neq j}|c_{ij}|\mbox{,}\]
+the first part of which is the objective function and the second part is a constant of $U$. 
+\item By some algebraic manipulation, $nV_n(U)$ can be re-written as \[tr(U\Sigma U\Sigma )+tr(UW_n)+\sqrt{n} \lambda \sum_{i\neq j}\left\lbrace u_{ij} \mbox{sign} (c_{ij})I(c_{ij}\neq 0)+|u_{ij}| I(c_{ij} =0)\right\rbrace +o(1)\mbox{,}\]
+where $W_n=\sqrt{n}(\bar{A}-\Sigma)\rightarrow N(0,\Lambda)$. 
+\item Because $W_n\rightarrow W$ and $\sqrt{n} \lambda \rightarrow \lambda_0$, we have $nV_n(U)\rightarrow V(U)$ in distribution. 
+\item Since both $V(U)$ and $V_n(U)$ are convex and $V(U)$ has a unique minimum, \[\mbox{arg} \min nV_n\left( U\right)=\sqrt{n} \left( \hat{C} - C\right) \stackrel{d}{\rightarrow} \mbox{arg} \min V\left( U\right) \mbox{.} \]
+\end{itemize}
+\subsubsection{Illustration}
+To have a more explicit view of the asymptotic distribution, give an example where $p=3$ as an illustration. 
+\[C=\left( \begin{array}{ccc}
+1 & \frac{1}{3} & 0 \\
+\frac{1}{3} & 1 & \frac{2}{3} \\
+0 & \frac{2}{3} & 1 \end{array} \right) \mbox{,}\qquad
+\Sigma=\left( \begin{array}{ccc}
+1.25 & -0.75 & 0.5 \\
+-0.75 & 2.25 & -1.5 \\
+0.5 & -1.5 & 2
+\end{array} \right) \mbox{.}
+\]
+Simulate 1000 observations from the asymptotic distribution $\mbox{arg} \min V$, and make scatterplots of the estimated concentration matrix elements of $\lambda_0=0,\; 0.5,\; \mbox{and }1$. 
+\begin{itemize}
+\item For $\lambda_0=0$, the estimator is the MLE, and its asymptotic distribution is multivariate normal due to the consistency of MLE. With no penalty, it has 0 probability of estimating $c_{13}$ by its true value 0. 
+\item For $\lambda_0=0.5$, there is a positive probability $Pr(\hat{c}_{13}=0)=0.3$, but the estimates of other non-zero elements are biased. 
+\item For $\lambda_0=1$, the probability of $Pr(\hat{c}_{13}=0)$ increases to 0.45.
+\end{itemize}
+
+This example shows the lasso-type estimator can produce a sparse estimate of the concentration matrix. However, it produces substantial biases in the estimates for large coefficients. 
+
+\subsection{Garrote-Type Estimator}
+\subsubsection{Theorem (Theorem 2)}
+With initial estimator $\tilde{C}=\bar{A}^{-1}$. If $n\lambda \rightarrow \infty$ and $\sqrt{n} \lambda \rightarrow 0$ as $n\rightarrow \infty$, then $Pr(\hat{c}_{ij}=0)\rightarrow 1$ if $c_{ij}=0$, and other elements of $\hat{C}$ have the same limiting distribution as the maximum likelihood estimator on the true graph structure. \\
+
+It indicates that the garrote-type estimator has better asymptotic property, which is called oracle property. First, it has a consistency in model selection, which can guarantee sparsity and correct graph structure. Second, it is a consistent estimator which is asymptotically normal and unbiased. 
+\subsubsection{Summary of Proof}
+\begin{itemize}
+\item Similarly, let $\hat{C}=C+\frac{U}{\sqrt{n}}$, and define $V_n(U)$ as the difference between the objective function values of $\hat{C}$ and $C$: 
+\[V_n(U)=-log\left\vert C+\frac{U}{\sqrt{n}}\right\vert +tr\left\lbrace \left( C+\frac{U}{\sqrt{n}}\right) \bar{A}\right\rbrace +\lambda \sum_{i\neq j} \frac{c_{ij}+u_{ij}/\sqrt{n}}{\tilde{c}_{ij}} +log|C|-tr(C\bar{A})-\lambda \sum_{i\neq j}\frac{c_{ij}}{\tilde{c}_{ij}} \mbox{.}\]
+\item As before, $V_n(U)=tr(U\Sigma U\Sigma )+tr(UW_n)+\sqrt{n} \lambda \sum_{i\neq j}\frac{u_{ij}}{\tilde{c}_{ij}} +o(1)$.
+\item $\sqrt{n} \lambda \sum_{c_{ij}\neq 0}\frac{u_{ij}}{\tilde{c}_{ij}} \rightarrow 0$, because if $c_{ij}\neq 0$, $\tilde{c}_{ij} \rightarrow c_{ij}$ in probability and $\sqrt{n} \lambda \rightarrow 0$. $nV_n(U)$ can be further rewritten as $tr(U\Sigma U\Sigma )+tr(UW_n)+n\lambda \sum_{c_{ij}=0}\frac{u_{ij}}{\tilde{c}_{ij} \sqrt{n}} +o(1)$. 
+\item If $c_{ij}=0$, the MLE $\tilde{c}_{ij}=o(n^{-1/2})$, then $\tilde{c}_{ij} \sqrt{n}=o(1)\rightarrow 0$. And since $n\lambda \rightarrow \infty$, the minimization of $nV_n(U)$ must satisfy $u_{ij}=0$ if $c_{ij}=0$ with probability tending to be one. 
+\item We also know that $\sqrt{n} \left( \hat{C}^{MLE} - C\right) \stackrel{d}{\rightarrow} \mbox{arg} \min \left\lbrace tr(U\Sigma U\Sigma)+tr(UW)\right\rbrace$. So, the asymptotic distribution of $nV_n(U)=\sqrt{n} \left( \hat{C} - C\right)$ is the same as MLE with $u_{ij}=0$ if $c_{ij}=0$.
+\end{itemize}
+
+\section{Computation}
+The computation of the proposed estimators requires optimization of nonlinear objective functions under the positive-definiteness constraint, and it can be connected with the maxdet problem. Both lasso-type and garrote-type estimators can be solved by maxdet problem. 
+
+
+\subsection{Algorithm for Lasso-Type Estimator}
+
+
+
+
+\end{document}
