@@ -1,36 +1,47 @@
 %----------------------------------------------------------------------------------------
-%	MATERIALS AND METHODS
+%	METHODS
 %----------------------------------------------------------------------------------------
 
-\section*{Materials and Methods}
+\section*{Methods}
+\subsection*{Lasso-type estimator}
+The MLE of this method is equivalent to the solution which minimizes 
+\begin{align*}
+    -log|C| + \frac{1}{n}\sum_{i=1}^n (X_i - \mu)' C (X_i - \mu)
+\end{align*}
 
-Fusce magna risus, molestie ut porttitor in, consectetur sed mi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Pellentesque consectetur blandit pellentesque. Sed odio justo, viverra nec porttitor vel, lacinia a nunc. Suspendisse pulvinar euismod arcu, sit amet accumsan enim fermentum quis. In id mauris ut dui feugiat egestas. Vestibulum ac turpis lacinia nisl commodo sagittis eget sit amet sapien. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
+However, we want some "sparsity" in the graph structure, i.e. filter out some of the near-zero entries so that trade-off some bias to obtain improved variance and thus achieve the lower MSE in the end. For this goal, we have to constrain the non-zero entries to be in some reasonable range. That is, for some $t$, to make the above term subject to $\sum_{i \neq j} |c_{ij}| \leq t$.
 
+Using the Lagrangian form, along with rewriting the above term, we are actually minimizing 
+\begin{align*}
+    -log|C| + tr(C \bar{A}) + \lambda \sum_{i \neq j} |c_{ij}| \tag{1}
+\end{align*}
+where $\bar{A}$ is the MLE of $\Sigma$ and $\lambda$ is a tuning parameter. 
 
-\subsection*{Mathematical Section}
+\subsection*{Non-negative garrote-type estimator}
+Given an already valid estimator $\tilde{C}$ on $C$, usually just the MLE $\bar{A}$, we could also achieve the shrinkage by $c_{ij} = d_{ij}\tilde{c}_{ij}$, where a symmetric matrix $D=(d_{ij})$ is the solution which minimizes
+\begin{align*}
+    -log|C| + tr(C \bar{A}) \quad \text{subject to} \quad \sum_{i \neq j} d_{ij} \leq t, d_{ij} \geq 0.
+\end{align*}
 
-Nulla vel nisl sed mauris auctor mollis non sed. 
+Similarly, using the Lagrangian form, along with some transformation, we are actually minimizing 
+\begin{align*}
+    -log|C| + tr(C \bar{A}) + \lambda \sum_{i \neq j} \frac{c_{ij}}{\tilde{c}_{ij}}, \quad \text{subject to} \quad c_{ij}/\tilde{c}_{ij} \geq 0 \tag{2}
+\end{align*}
+and $C$ is positive definite. 
 
-\begin{equation}
-E = mc^{2}
-\label{eqn:Einstein}
-\end{equation}
+\subsection*{Illustration in a simple situation}
+Consider the situation where $p=2$, where concentration matrix be 2 dimensional and we could easily derive the solution to (1) and (2) as below:
+\begin{align*}
+    \hat{c}_{12}^{\text{lasso-type}} &= \left( \frac{(1-r^2)[|r| - \lambda(1-r^2)]}{1 - [|r| - \lambda (1 - r^2)]^2} \right)_+ sign(r) \tag{3} \\
+    \hat{c}_{12}^{\text{garrote-type}} &= \left( \frac{(1-r^2)[|r| - \lambda(1-r^2)]}{|r| - [r^2 - \lambda (1 - r^2)]^2/|r|} \right)_+ sign(r) \tag{4} 
+\end{align*}
+where $r$ is the MLE of $c_{ij}$. 
 
-Curabitur mi sem, pulvinar quis aliquam rutrum. (1) edf (2)
-, $\Omega=[-1,1]^3$, maecenas leo est, ornare at. $z=-1$ edf $z=1$ sed interdum felis dapibus sem. $x$ set $y$ ytruem. 
-Turpis $j$ amet accumsan enim $y$-lacina; 
-ref $k$-viverra nec porttitor $x$-lacina. 
+The relationship between two types of estimator and MLE($r$) is shown on Figure 1. Both of them have the "cut-off" range which is determined by the tuning parameter, and the other range has an overall shrinkage that lowers the estimate down. However, as the MLE increases in absolute value, lasso-type estimator further departs the MLE, while the garrote estimator tends to get closer to the MLE. 
 
-Vestibulum ac diam a odio tempus congue. Vivamus id enim nisi:
+We think the penalty on non-zero terms brings some bias to the model in trade of reduced variance, which is the effect of "cut-off" range. However, when it's outside this range, we may want it closer to the MLE so that the bias can be controlled. In this sense, garrote-type estimator should be more favorable, but the fact that it requires a initial estimator is somewhat restricting. We will further discuss this issue on the "future work" part.
 
-\begin{eqnarray}
-\cos\bar{\phi}_k Q_{j,k+1,t} + Q_{j,k+1,x}+\frac{\sin^2\bar{\phi}_k}{T\cos\bar{\phi}_k} Q_{j,k+1} &=&\nonumber\\ 
--\cos\phi_k Q_{j,k,t} + Q_{j,k,x}-\frac{\sin^2\phi_k}{T\cos\phi_k} Q_{j,k}\label{edgek}
-\end{eqnarray}
-and
-\begin{eqnarray}
-\cos\bar{\phi}_j Q_{j+1,k,t} + Q_{j+1,k,y}+\frac{\sin^2\bar{\phi}_j}{T\cos\bar{\phi}_j} Q_{j+1,k}&=&\nonumber \\
--\cos\phi_j Q_{j,k,t} + Q_{j,k,y}-\frac{\sin^2\phi_j}{T\cos\phi_j} Q_{j,k}.\label{edgej}
-\end{eqnarray} 
-
-Nulla sed arcu arcu. Duis et ante gravida orci venenatis tincidunt. Fusce vitae lacinia metus. Pellentesque habitant morbi. $\mathbf{A}\underline{\xi}=\underline{\beta}$ Vim $\underline{\xi}$ enum nidi $3(P+2)^{2}$ lacina. Id feugain $\mathbf{A}$ nun quis; magno. Fusce convallis rutrum turpis, quis aliquet enim accumsan id. Vestibulum ullamcorper porttitor convallis. Integer sagittis interdum malesuada. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed adipiscing tristique orci at ullamcorper. Morbi accumsan, urna et porttitor pulvinar, lacus risus dignissim massa. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
+\begin{center}
+\includegraphics[width=0.75\linewidth]{Fig1}
+\captionof{figure}{\color{Green} (a) Lasso-type estimator, (b) garrote-type estimator}
+\end{center}
