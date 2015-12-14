@@ -31,7 +31,7 @@ The theorem shows that the lasso-type estimator converges to a limiting distribu
 
 \subsubsection{Summary of Proof}
 \begin{itemize}
-\item First, let the estimator $\hat{C}=C+\frac{U}{\sqrt{n}}$. Subtly define $V_n(U)$ as the difference between the objective function values of $\hat{C}$ and $C$: \[V_n(U)=-log\left\vert C+\frac{U}{\sqrt{n}}\right\vert +tr\left\lbrace \left( C+\frac{U}{\sqrt{n}}\right) \bar{A}\right\rbrace +\lambda \sum_{i\neq j} \left\vert c_{ij}+\frac{u_{ij}}{\sqrt{n}}\right\vert +log|C|-tr(C\bar{A})-\lambda \sum_{i\neq j}|c_{ij}|\mbox{,}\]
+\item First, let the estimator $\hat{C}=C+\frac{U}{\sqrt{n}}$. Subtly define $V_n(U)$ as the difference between the objective function values of $\hat{C}$ and $C$: \[V_n(U)=-\log\left\vert C+\frac{U}{\sqrt{n}}\right\vert +tr\left\lbrace \left( C+\frac{U}{\sqrt{n}}\right) \bar{A}\right\rbrace +\lambda \sum_{i\neq j} \left\vert c_{ij}+\frac{u_{ij}}{\sqrt{n}}\right\vert +\log|C|-tr(C\bar{A})-\lambda \sum_{i\neq j}|c_{ij}|\mbox{,}\]
 the first part of which is the objective function and the second part is a constant of $U$. 
 \item By some algebraic manipulation, $nV_n(U)$ can be re-written as \[tr(U\Sigma U\Sigma )+tr(UW_n)+\sqrt{n} \lambda \sum_{i\neq j}\left\lbrace u_{ij} \mbox{sign} (c_{ij})I(c_{ij}\neq 0)+|u_{ij}| I(c_{ij} =0)\right\rbrace +o(1)\mbox{,}\]
 where $W_n=\sqrt{n}(\bar{A}-\Sigma)\rightarrow N(0,\Lambda)$. 
@@ -67,7 +67,7 @@ It indicates that the garrote-type estimator has better asymptotic property, whi
 \subsubsection{Summary of Proof}
 \begin{itemize}
 \item Similarly, let $\hat{C}=C+\frac{U}{\sqrt{n}}$, and define $V_n(U)$ as the difference between the objective function values of $\hat{C}$ and $C$: 
-\[V_n(U)=-log\left\vert C+\frac{U}{\sqrt{n}}\right\vert +tr\left\lbrace \left( C+\frac{U}{\sqrt{n}}\right) \bar{A}\right\rbrace +\lambda \sum_{i\neq j} \frac{c_{ij}+u_{ij}/\sqrt{n}}{\tilde{c}_{ij}} +log|C|-tr(C\bar{A})-\lambda \sum_{i\neq j}\frac{c_{ij}}{\tilde{c}_{ij}} \mbox{.}\]
+\[V_n(U)=-\log\left\vert C+\frac{U}{\sqrt{n}}\right\vert +tr\left\lbrace \left( C+\frac{U}{\sqrt{n}}\right) \bar{A}\right\rbrace +\lambda \sum_{i\neq j} \frac{c_{ij}+u_{ij}/\sqrt{n}}{\tilde{c}_{ij}} +\log|C|-tr(C\bar{A})-\lambda \sum_{i\neq j}\frac{c_{ij}}{\tilde{c}_{ij}} \mbox{.}\]
 \item As before, $V_n(U)=tr(U\Sigma U\Sigma )+tr(UW_n)+\sqrt{n} \lambda \sum_{i\neq j}\frac{u_{ij}}{\tilde{c}_{ij}} +o(1)$.
 \item $\sqrt{n} \lambda \sum_{c_{ij}\neq 0}\frac{u_{ij}}{\tilde{c}_{ij}} \rightarrow 0$, because if $c_{ij}\neq 0$, $\tilde{c}_{ij} \rightarrow c_{ij}$ in probability and $\sqrt{n} \lambda \rightarrow 0$. $nV_n(U)$ can be further rewritten as $tr(U\Sigma U\Sigma )+tr(UW_n)+n\lambda \sum_{c_{ij}=0}\frac{u_{ij}}{\tilde{c}_{ij} \sqrt{n}} +o(1)$. 
 \item If $c_{ij}=0$, the MLE $\tilde{c}_{ij}=o(n^{-1/2})$, then $\tilde{c}_{ij} \sqrt{n}=o(1)\rightarrow 0$. And since $n\lambda \rightarrow \infty$, the minimization of $nV_n(U)$ must satisfy $u_{ij}=0$ if $c_{ij}=0$ with probability tending to be one. 
@@ -77,9 +77,46 @@ It indicates that the garrote-type estimator has better asymptotic property, whi
 \section{Computation}
 The computation of the proposed estimators requires optimization of nonlinear objective functions under the positive-definiteness constraint, and it can be connected with the maxdet problem. Both lasso-type and garrote-type estimators can be solved by maxdet problem. 
 
-
 \subsection{Algorithm for Lasso-Type Estimator}
-
+\subsubsection{Algorithm}
+Different from the garrote-type estimator that can be directly solved by maxdet problem, lasso-type estimator can be expressed as maxdet problem only if the signs of $c_{ij}$'s are known. 
+\[\min_C tr(C\bar{A})-\log|C|,\quad \mbox{subject to }C\mbox{ being positive definite, }t-2\sum_{i<j}c_{ij}s_{ij}\geq 0,\; s_{ij}c_{ij}\geq 0\]
+Since the signs of $c_{ij}$'s are not known in advance, we are supposed to use the following algorithm to update $s_{ij}$'s and $c_{ij}$'s iteratively. 
+\begin{itemize}
+\item \emph{Step 1.} Initialize $\hat{C}_{old}=\bar{A}^{-1}$ and $s_{ij}=sign\left\lbrace (\hat{C}_{old})_{ij}\right\rbrace $ for all $i\neq j$.
+\item \emph{Step 2.} Solve the maxdet problem over the set of positive definite matrices, solution $\hat{C}_{new}$. 
+\item \emph{Step 3.} If $\hat{C}_{new}=\hat{C}_{old}$, then stop and let $\hat{C}=\hat{C}_{new}$. Otherwise, set $\hat{C}_{old}=\hat{C}_{new}$ and $s_{ij}=-s_{ij}$ for all pairs $(i,j)$ such that $\hat{c}_{ij}=0$ and go back to Step 2.
+\end{itemize}
+\subsubsection{Convergence (Lemma 3)}
+The above algorithm always converges and converges to the solutions to (1). And in practice, the algorithm usually converges within a small number of iterations. \\
+\emph{Summary of Proof: }
+\begin{itemize}
+\item The minima attained in the iterations form a strictly decreasing sequence. However, the number of possible sign matrices is finite. Therefor the algorithm has to terminate. 
+\item $\hat{C}$ solves with both the two sign matrices $\hat{S}$ and $\tilde{S}$: $\hat{s}_{ij}=-\tilde{s}_{ij}$ for any $\hat{c}_{ij}=0$ and $\hat{s}_{ij}=\tilde{s}_{ij}$ for any $\hat{c}_{ij}\neq 0$, because $\hat{C}=\hat{C}_{new}=\hat{C}_{old}$.
+\item By Karush-Kuhn-Tucker conditions, we have: \[\left\lbrace
+\begin{array}{l}
+\left.\frac{\partial l}{\partial c_{ij}}\right\vert_{C=\hat{C}}+\lambda_1 \hat{s}_{ij}-\lambda_{ij}\hat{s}_{ij}=0\\
+\lambda_1\left(t-2\sum_{i<j}\hat{c}_{ij}\hat{s}_{ij}\right)=0\\
+\lambda_{ij}\left(\hat{s}_{ij}\hat{c}_{ij}\right)=0
+\end{array}\right.
+\mbox{,}\qquad \mbox{where }\lambda_1>0\mbox{ and }\lambda_{ij}\geq 0\mbox{, }l(C)=-\log|C|+tr(C\bar{A})\mbox{.}\]
+\item By some simple manipulation, \[\left\lbrace
+\begin{array}{ll}
+\left. \frac{\partial l}{\partial c_{ij}}\right\vert_{C=\hat{C}}\hat{s}_{ij}=-\lambda_1\mbox{, } & \mbox{for all }\hat{c}_{ij}\neq 0\\
+ \left. \frac{\partial l}{\partial c_{ij}}\right\vert_{C=\hat{C}}\hat{s}_{ij}\geq -\lambda_1\mbox{, } & \mbox{for all }\hat{c}_{ij}= 0
+\end{array}\right.
+\mbox{. Similarly, }\left\lbrace
+\begin{array}{ll}
+\left. \frac{\partial l}{\partial c_{ij}}\right\vert_{C=\hat{C}}\tilde{s}_{ij}=-\lambda_2\mbox{, } & \mbox{for all }\hat{c}_{ij}\neq 0\\
+ \left. \frac{\partial l}{\partial c_{ij}}\right\vert_{C=\hat{C}}\tilde{s}_{ij}\geq -\lambda_2\mbox{, } & \mbox{for all }\hat{c}_{ij}= 0
+\end{array}\right.\mbox{.}
+\]
+\item With the fact that $\hat{s}_{ij}=\tilde{s}_{ij}$, we can conclude that $\lambda_1=\lambda_2=\lambda$. So, the algorithm converges, and also the solution is equivalently to (1). 
+\end{itemize}
+\subsection{Tuning}
+In practice, we need to choose a tuning parameter $t$ or $\lambda$ to minimize a score measuring the goodness-of-fit. Multifold cross-validation score is commonly used, but the author recommends a computationally more efficient method using BIC. The score is defined as: 
+\[BIC(t)=-\log|\hat{C}(t)|+tr\{\hat{C}(t)\bar{A}\}+\frac{\log n}{n}\sum_{i\leq j}\hat{e}_{ij}(t)\mbox{,}\]
+where $\hat{e}_{ij}=0$ if $\hat{c}_{ij}=0$, and $\hat{e}_{ij}=1$ otherwise. It is negative log-likelihood with a penalty of degrees of freedom. We choose the tuning parameter $t$ which minimizes the BIC score. 
 
 
 
