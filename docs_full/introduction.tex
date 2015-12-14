@@ -1,0 +1,15 @@
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\color{SaddleBrown} % SaddleBrown color for the introduction
+
+\section*{Introduction and Motivation}
+
+The main set up for the (undirected) graph structure learning problem is as follows: Assume $f(X_1, _2, \cdots, X_p)$ is a multivariate distribution that satisfies Markov Property with respect to an unknown graph $G$, from which we observe $(\mathbf{x}^{(1)}, \cdots, \mathbf{x}^{(n)})$ i.i.d observations from $f$, and our goal is to learn $G$ from $(\mathbf{x}^{(1)}, \cdots, \mathbf{x}^{(n)})$. 
+
+Let's further assume that this $f$ follows a multivariate normal distribution $N_p(\mu, \Sigma)$, and the concentration matrix is denoted as $C = \Sigma^{-1}$. One of the main issue is to correctly detect the zero entries $c_{ij} = 0$ in the concentric matrix, since $c_{ij} \Leftrightarrow (X_i, X_j) \notin E \Leftrightarrow X_i \independent X_j | X_s$, where $E$ is the set of edges in $G$, and $X_s$ is the set of nodes except $X_i$ and $X_j$. 
+
+The three perspectives of Markov Property provides us with different approaches to the graph learning problem. In Gaussian case, Pairwise Markov Property, $(X_i, X_j) \notin E \Leftrightarrow X_i \independent X_j | X_s$, becomes $Cov(X_i, X_j | X_s) = \Leftrightarrow (X_i, X_j) \notin E$, where covariance is estimated by empirical conditional covariance. However, we need to do this for ${p \choose 2}$ pairs of nodes. This leads to the multiple testing problems. Moreover, some of these tests are not independent. The second approach, using Local Markov Property, tries to determine the neighborhood set for a node by regressing all other nodes on this node. Penalizing on the number of non-zero regression coefficients using BIC or AIC, which converts to the Lasso problem, will filter the zero terms effectively. However, the problem is that in undirected graph, the ordering of nodes does not matter, so we have to regress all other nodes against each node. Thus in some case, it leads to the contradiction of $(X_i, X_j) \in E$ and $(X_j, X_i) \notin E$.
+
+The third approach is to use Global Markov Property, which is the idea behind the method proposed by this paper. This likelihood based method employs an $l_1$ penalty, and thus called "lasso type" estimator, on the off-diagonal entries $c_{ij}$ and thus leads to a sparse concentration matrix. Beside, the constraint of $C$ being positive definite is also satisfied. Moreover, a "non-negative garrote type" method is also introduced. The asymptotic properties and the relationship with other method can also be shown in detail. The computation of this method is turned into a \emph{maxdet} problem, and an efficient algorithm is developed for the lasso type estimator. The simulation part compares two types of estimators with some other methods. 
